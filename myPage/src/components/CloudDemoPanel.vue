@@ -338,7 +338,7 @@
                 <!-- Tech Note -->
                 <div class="tech-note">
                     <span>🔬</span>
-                    <span>MobileNetV2 雲朵分類器 (TF.js) · Adam 梯度下降直接優化像素值 · 純前端 WebGL 推論</span>
+                    <span>瀏覽器推論模型參數尚未細調，精準的pytorch模型輸出結果請參考「猜猜我是誰」的內容</span>
                 </div>
 
             </template>

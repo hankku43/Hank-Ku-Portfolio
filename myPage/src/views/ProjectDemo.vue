@@ -57,7 +57,7 @@
                                         width="18" height="18">
                                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                                     </svg>
-                                    互動示範
+                                    互動示範(第一次載入模型可能須等待3~5分鐘)
                                 </h2>
 
                                 <!-- ===== text-input 模式 ===== -->
@@ -102,15 +102,37 @@
                                         <div v-for="s in project.demoConfig.samples" :key="s.id"
                                             class="image-thumb"
                                             :class="{ selected: selectedSample?.id === s.id }"
-                                            @click="selectedSample = s; showResult = false">
+                                            @click="selectSample(s)">
                                             <img :src="s.url" :alt="s.label" />
                                             <span class="thumb-label">{{ s.label }}</span>
                                             <div v-if="selectedSample?.id === s.id" class="check-mark">✓</div>
                                         </div>
                                     </div>
 
+                                    <div class="upload-area"
+                                        :class="{ 'upload-area--active': uploadedFile }"
+                                        @click="fileInputRef?.click()"
+                                        @dragover.prevent
+                                        @drop.prevent="onDrop">
+                                        <input ref="fileInputRef" type="file" accept="image/*"
+                                            style="display:none" @change="onFileChange" />
+                                        <template v-if="uploadedFile">
+                                            <img :src="uploadedPreviewUrl" class="upload-preview" />
+                                            <span class="upload-filename">{{ uploadedFile.name }}</span>
+                                        </template>
+                                        <template v-else>
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                                <polyline points="17 8 12 3 7 8"/>
+                                                <line x1="12" y1="3" x2="12" y2="15"/>
+                                            </svg>
+                                            <span>或上傳自己的圖片</span>
+                                            <span class="upload-hint">拖曳 / 點擊 · JPG、PNG、WEBP</span>
+                                        </template>
+                                    </div>
+
                                     <button class="run-btn" :class="{ loading: isLoading }"
-                                        :disabled="!selectedSample || isLoading" @click="handleRun">
+                                        :disabled="(!selectedSample && !uploadedFile) || isLoading" @click="handleRun">
                                         <template v-if="isLoading">
                                             <span class="spinner-sm"></span> 辨識中...
                                         </template>
@@ -305,7 +327,7 @@
                                             <div v-if="apiError" class="api-error">{{ apiError }}</div>
                                             <template v-else>
                                                 <div class="result-image-wrap">
-                                                    <img :src="selectedSample.url" alt="辨識結果" />
+                                                    <img :src="currentImageUrl" alt="辨識結果" />
                                                     <!-- 真實 API 偵測框 -->
                                                     <template v-if="vehicleResult?.detections?.length">
                                                         <div v-for="(det, i) in vehicleResult.detections" :key="i"
@@ -470,6 +492,9 @@ watch(() => route.params.id, () => {
     ragResult.value = null;
     statusMsg.value = '';
     vehicleResult.value = null;
+    if (uploadedPreviewUrl.value) URL.revokeObjectURL(uploadedPreviewUrl.value);
+    uploadedFile.value = null;
+    uploadedPreviewUrl.value = '';
 });
 
 // text-input 的示範回應 — 優先使用 demoConfig.mockResult，否則顯示通用佔位
@@ -592,6 +617,56 @@ const statusMsg = ref('');
 const statusDone = computed(() => statusMsg.value.startsWith('✓'));
 const vehicleResult = ref(null);
 
+const uploadedFile = ref(null);
+const uploadedPreviewUrl = ref('');
+const fileInputRef = ref(null);
+const currentImageUrl = computed(() =>
+    uploadedFile.value ? uploadedPreviewUrl.value : (selectedSample.value?.url ?? '')
+);
+
+function selectSample(s) {
+    if (uploadedPreviewUrl.value) URL.revokeObjectURL(uploadedPreviewUrl.value);
+    uploadedFile.value = null;
+    uploadedPreviewUrl.value = '';
+    selectedSample.value = s;
+    showResult.value = false;
+    vehicleResult.value = null;
+    apiError.value = '';
+}
+
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
+function _applyUpload(file) {
+    if (!file.type.startsWith('image/')) {
+        apiError.value = '請上傳圖片檔案（JPG、PNG、WEBP 等）';
+        return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+        apiError.value = `圖片大小不能超過 5MB（目前 ${(file.size / 1024 / 1024).toFixed(1)} MB）`;
+        return;
+    }
+    if (uploadedPreviewUrl.value) URL.revokeObjectURL(uploadedPreviewUrl.value);
+    uploadedFile.value = file;
+    uploadedPreviewUrl.value = URL.createObjectURL(file);
+    selectedSample.value = null;
+    showResult.value = false;
+    vehicleResult.value = null;
+    apiError.value = '';
+}
+
+function onFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    _applyUpload(file);
+    e.target.value = '';
+}
+
+function onDrop(e) {
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    _applyUpload(file);
+}
+
 const _processingMsg = (id) => ({
     'rag-traffic':        null,
     'ptt-classifier':     'Doc2Vec 嵌入 → MLP 分類中...',
@@ -624,7 +699,7 @@ const getBoxStyle = (det) => {
 };
 
 const handleRun = async () => {
-    if (!selectedSample.value) return;
+    if (!selectedSample.value && !uploadedFile.value) return;
     isLoading.value = true;
     showResult.value = false;
     vehicleResult.value = null;
@@ -634,11 +709,15 @@ const handleRun = async () => {
     const endpoint = project.value?.demoConfig?.apiEndpoint;
     if (endpoint) {
         try {
-            statusMsg.value = '載入影像中...';
-            const imgRes = await fetch(selectedSample.value.url);
-            const blob = await imgRes.blob();
             const formData = new FormData();
-            formData.append('file', blob, 'image.jpg');
+            if (uploadedFile.value) {
+                formData.append('file', uploadedFile.value, uploadedFile.value.name);
+            } else {
+                statusMsg.value = '載入影像中...';
+                const imgRes = await fetch(selectedSample.value.url);
+                const blob = await imgRes.blob();
+                formData.append('file', blob, 'image.jpg');
+            }
 
             statusMsg.value = 'Faster R-CNN 車輛偵測中...';
             const base = import.meta.env.VITE_API_BASE_URL || '';
@@ -1011,6 +1090,43 @@ const handleInteractive = async () => {
     justify-content: center;
 }
 .mode-dark .check-mark { background: #4ecdc4; color: #0f172a; }
+
+/* ===== 上傳區 ===== */
+.upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 2px dashed rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 72px;
+    color: inherit;
+    opacity: 0.7;
+    font-size: 13px;
+}
+.upload-area:hover { border-color: #3b82f6; opacity: 1; background: rgba(59, 130, 246, 0.05); }
+.upload-area--active { border-color: #3b82f6; border-style: solid; opacity: 1; padding: 10px; }
+.mode-dark .upload-area:hover { border-color: #4ecdc4; background: rgba(78, 205, 196, 0.05); }
+.mode-dark .upload-area--active { border-color: #4ecdc4; }
+.upload-hint { font-size: 11px; opacity: 0.55; }
+.upload-preview {
+    width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+.upload-filename {
+    font-size: 11px;
+    opacity: 0.65;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 /* ===== interactive 模式 ===== */
 .interactive-instruction {
