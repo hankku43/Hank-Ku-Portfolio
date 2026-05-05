@@ -9,12 +9,15 @@ services:
     container_name: mypage_backend
     restart: always
     environment:
-      # ⚠️  生產環境請替換為實際前端網域，例如:
-      # CORS_ORIGINS=["https://your-domain.com"]
       - CORS_ORIGINS=${CORS_ORIGINS:-["*"]}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./backend/models:/app/models
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # 前端: 編譯後的 Vue 靜態檔 + Nginx 反向代理
   frontend:
@@ -24,13 +27,18 @@ services:
     container_name: mypage_frontend
     restart: always
     ports:
-      - "80:80"    # HTTP
-      - "443:443"  # HTTPS (需先用 certbot 取得憑證)
+      - "80:80"
+      - "443:443"
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     depends_on:
       - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Certbot: Let's Encrypt SSL 憑證簽發與自動更新
   # 首次部署後執行: docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d your-domain.com
