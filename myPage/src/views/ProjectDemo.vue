@@ -266,7 +266,7 @@
                                             <div v-if="apiError" class="api-error">{{ apiError }}</div>
                                             <template v-else-if="ragResult">
                                                 <div class="rag-answer-block">
-                                                    <span class="rag-section-label">▸ Gemma3 4B 回答</span>
+                                                    <span class="rag-section-label">▸ Llama 4 Scout 回答</span>
                                                     <p class="rag-answer-text">{{ ragResult.answer }}</p>
                                                 </div>
                                                 <div v-if="ragResult.retrieved?.length" class="rag-retrieved-block">

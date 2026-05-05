@@ -11,6 +11,7 @@ services:
     environment:
       - CORS_ORIGINS=${CORS_ORIGINS:-["*"]}
       - PYTHONUNBUFFERED=1
+      - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
       - ./backend/models:/app/models
     logging:

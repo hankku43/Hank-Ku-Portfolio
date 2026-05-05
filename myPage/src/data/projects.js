@@ -121,16 +121,16 @@ export const projects = [
     {
         id: 'rag-traffic',
         name: '交通法規 RAG 系統',
-        shortDesc: '以自訓 Doc2Vec 語意嵌入搭配 CKIP 中文斷詞，實作多階段回退 RAG 管線，透過Ollama（Gemma3 4B）回答台灣交通法規問題。',
-        fullDesc: '針對《道路交通管理處罰條例》全文建構 RAG 問答系統。資料前處理以 CKIP-Transformers（BERT-based）進行中文斷詞與詞性過濾，將條文切割為 25 詞上限的語意chunk；再以 Gensim Doc2Vec（200 維，DBOW，100 epoch）對所有 chunk 訓練語意嵌入模型。查詢時採四階段漸進式回退策略：① 直接相似度搜尋（閾值 0.8）→ ② LLM 同義詞擴展（0.6）→ ③ 口語轉法律用語（0.5）→ ④ HyDE 假設文件嵌入（0.4），最後將 Top-K 條文作為 Context 送入本地 Ollama Gemma3 4B 生成回答，並驗證模型是否能回答後才輸出結果。',
+        shortDesc: '以自訓 Doc2Vec 語意嵌入搭配 CKIP 中文斷詞，實作多階段回退 RAG 管線，透過 Groq（Llama 4 Scout）回答台灣交通法規問題。',
+        fullDesc: '針對《道路交通管理處罰條例》全文建構 RAG 問答系統。資料前處理以 CKIP-Transformers（BERT-based）進行中文斷詞與詞性過濾，將條文切割為 25 詞上限的語意chunk；再以 Gensim Doc2Vec（200 維，DBOW，100 epoch）對所有 chunk 訓練語意嵌入模型。查詢時採四階段漸進式回退策略：① 直接相似度搜尋（閾值 0.8）→ ② LLM 同義詞擴展（0.6）→ ③ 口語轉法律用語（0.5）→ ④ HyDE 假設文件嵌入（0.4），最後將 Top-K 條文作為 Context 送入 Groq Llama 4 Scout 生成回答，並驗證模型是否能回答後才輸出結果。',
         type: 'nlp',
-        tags: ['Python', 'Gensim', 'Doc2Vec', 'CKIP-Transformers', 'Ollama', 'Gemma3', 'HyDE', 'RAG'],
+        tags: ['Python', 'Gensim', 'Doc2Vec', 'CKIP-Transformers', 'Groq', 'Llama 4', 'HyDE', 'RAG'],
         image: '/images/previews/RAG.png',
         highlights: [
             '自訓 Doc2Vec 200 維語意嵌入（DBOW, 100 epoch），專為台灣交通法規語料優化',
             '四階段回退 RAG：直接搜尋 → 同義詞擴展 → 法律術語轉換 → HyDE 假設文件嵌入',
             'CKIP-Transformers 中文斷詞 + 詞性過濾，移除法律樣板詞保留語意關鍵詞',
-            '完全本地推論：Ollama Gemma3 4B，無需外部 API，隱私安全',
+            'Groq LPU 加速推論：Llama 4 Scout 17B，高速雲端 API',
         ],
         demoMode: 'text-input',
         demoConfig: {

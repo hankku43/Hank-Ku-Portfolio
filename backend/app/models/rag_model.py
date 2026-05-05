@@ -61,7 +61,7 @@ def _call_groq(prompt: str) -> str:
         raise RuntimeError("GROQ_API_KEY 未設定")
     client = Groq(api_key=api_key)
     completion = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
         max_tokens=512,

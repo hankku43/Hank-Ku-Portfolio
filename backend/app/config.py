@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     rag_doc2vec_path: str = "models/traffic_law_doc2vec.model"
     rag_csv_path: str = "models/traffic_law_articles.csv"
     classical_nlp_model_path: str = "models/classical_chinese_lm.pth"
-    ollama_base_url: str = "http://localhost:11434"
+    groq_api_key: str = ""
     cors_origins: list[str] = ["*"]
 
     class Config:
