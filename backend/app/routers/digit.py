@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 log = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 class PredictRequest(BaseModel):
-    image: str  # base64-encoded PNG/JPEG from Canvas
+    image: str = Field(..., max_length=10000)  # base64-encoded PNG/JPEG from Canvas
 
 
 class ClassItem(BaseModel):

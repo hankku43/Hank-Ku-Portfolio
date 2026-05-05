@@ -1,14 +1,14 @@
 import json
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
 
 class QueryRequest(BaseModel):
-    prompt: str
-    top_k: int = 3
+    prompt: str = Field(..., max_length=500)
+    top_k: int = Field(default=3, ge=1, le=10)
 
 
 class RetrievedDoc(BaseModel):

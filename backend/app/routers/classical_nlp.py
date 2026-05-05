@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
 
 class GenerateRequest(BaseModel):
-    prompt: str
+    prompt: str = Field(..., max_length=50)
     style: str = "wuyan"  # wuyan (五言絕句) | qiyan (七言絕句) | translate
-    max_length: int = 100
-    temperature: float = 0.85
+    max_length: int = Field(default=100, ge=1, le=200)
+    temperature: float = Field(default=0.85, ge=0.1, le=2.0)
 
 
 class GenerateResponse(BaseModel):
