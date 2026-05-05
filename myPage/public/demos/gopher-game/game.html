@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/game.css">
+    
+</head>
+<body>
+    <audio id="hover_sound" src="sound/hover.ogg"></audio>
+    <audio id="hitbutton_sound" src="sound/hitbutton.ogg"></audio>
+    <!-- hitbutton.ogg by luminousfridge -- https://freesound.org/s/496191/ -- License: Attribution 4.0-->
+    <audio id="gopher_hert" src="sound/injury.mp3"></audio>
+    <audio id="BGM" src="sound/Pixel Heartbeat.mp3" loop></audio>
+    <audio id="count_sound" src="sound/countdown.wav"></audio>
+    <audio id="start_sound" src="sound/countgo.wav"></audio>
+    <audio id="pass_sound" src="sound/pass.mp3"></audio>
+    <audio id="victory_sound" src="sound/victory.wav"></audio>
+    <audio id="fill_sound" src="sound/fill_sound.wav"></audio>
+   <div class="game_region" style="display: block;">
+        <div class="game_initial_page" style="display: flex;">
+            <button id="initial_button" class="game_button" onclick="playBGM(),backToEntry()">進入遊戲！</button>
+        </div>
+        <div class="entry" style="display: none;">
+            <div class="title_region">
+                <div class="title_container"><h1>地鼠王國</h1><h2>勇者傳說</h2><h4 id="mode">簡單模式&lt;預設&gt;</h4></div>
+            </div>
+            <div class="buttom_region">
+                <div class="startgame_buttom_region">
+                    <div class="startgame_buttom game_button" onclick="countDown_and_start()"><span>開始遊戲</span></div>
+                </div>
+                <div class="introduce_buttom_region">
+                    <div class="introduce_buttom game_button" onclick="changePageToIntroduction()"><span>遊戲說明</span></div>
+                </div>
+                <div class="setting_buttom_region">
+                    <div class="setting_buttom game_button" onclick="changePageToSetting()"><span>設定</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game_introduce" style="display: none;">
+            <div class="back_button game_button" onclick="backToEntry()"></div>
+            <div class="roleintroduce">
+                <h1>遊戲說明</h1>
+                <p>本遊戲分成3個難度，每個難度一共3個關卡，達到指定分數後即可通關。</p>           
+            </div>
+            <div class="gopher_introduce">
+                <h1>地鼠介紹</h1>
+                <div class="badgopherintroduce_region">
+                    <div class="introduceGopherImgContainer"><img src="img/badgopher.png" alt="badgopher"></img></div>
+                    <div class="badgopherintroduce">這是卡哇●拉達，鼠如其名的壞地鼠，特徵是紅通通的鼻子和邪惡的眼睛。</div>
+                </div>
+                <div class="goodgopherintroduce_region">
+                    <div class="introduceGopherImgContainer"><img src="img/goodgopher.png" alt="goodgopher"></img> </div>
+                    <div class="goodgopherintroduce">這是卡哇●咿依，象徵著愛與和平，你絕對不會想要傷害他。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gamesetting" style="display: none;">
+            <div class="back_button game_button" onclick="backToEntry()"></div>
+            <div class="difficultyselector_region">
+                <h1>難度選擇</h1>
+                <div class="difficulty_button_container">
+                    <button class="difficulty_button current_active game_button" id="easy_button" data-difficulty="1"><p>簡單</p></button>
+                    <button class="difficulty_button game_button" id="medium_button" data-difficulty="1.5"><p>中等</p></button>
+                    <button class="difficulty_button game_button" id="hard_buttom" data-difficulty="2"><p>困難</p></button>
+                </div>
+            </div>
+            <div class="volumesetting_region">
+                <h1>音量設定</h1>
+                <div class="bgmsetting_region">
+                    <h3>背景音樂</h3><img src="img/thesound.png" onclick="muteBGM()"/><input type="range" value="100"></input><span id="bgm_volume">100</span>
+                </div>
+                <div class="soundeffectsetting_region">
+                    <h3>音效</h3> <img src="img/thesound.png" onclick="muteEffect()"/> <input type="range" value="100"></input><span id="sound_volume">100</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass_page" style="display: none;">
+            <!-- <h1 class="congrad">恭喜通過！</h1> -->
+            <h3 class="next_button game_button" onclick="countDown_and_start()">下一關開始</h3>
+        </div>
+
+        <div class="fill_page" style="display: none;">
+            <!-- <h1>挑戰失敗！</h1> -->
+            <div class="fill_btn_container"><div onclick="countDown_and_start()"><span>再來一次</span></div></div>
+            <div class="fill_btn_container"><div onclick="backToEntry()"><span>回到主畫面</span></div></div>
+            
+        </div>
+
+        <div class="win_page" style="display: none;">
+            <!-- <h1 class="congrad">獲得勝利！</h1> -->
+            <h3 class="back_to_entry_button game_button" onclick="backToEntry()">回到主畫面</h3>
+        </div>
+
+        <div class="count_page" style="display: none;">
+            <div class="count_page_text_container">
+                <span></span>
+            </div>
+        </div>
+
+        <div class="time_and_score" style="display: none;">
+            <div class="timer">Timer: 0</div>
+            <div class="score">Score: 0</div>
+        </div>
+        
+        <div class="play_region" style="display: none;">
+            <div class="set small" style="right: -50px;">
+                <div class="hit_region" style="transform: scale(0.6); top: 8%; right: 15%;">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>
+            <div class="set small">
+                <div class="hit_region" style="transform: scale(0.6); top: 8%; right: 15%;">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>
+            <div class="set small" style="left: -50px;">
+                <div class="hit_region" style="transform: scale(0.6); top: 8%; right: 15%;">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>
+            <div class="set">
+                <div class="hit_region">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>
+            <div class="set">
+                <div class="hit_region">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>
+            <div class="set">
+                <div class="hit_region">
+                    <div class="hammer"></div>
+                </div>
+                <div class="line"></div>
+                <div class="gopher">
+                    <img src="img/badgopher.png" alt="gopher"/>
+                    <img src="img/goodgopher.png" alt="gopher"/>
+                    <img src="img/dizzybadgopher.png" alt="gopher" style="display: none;"/>
+                    <img src="img/dizzygoodgopher.png" alt="gopher" style="display: none;"/>
+                </div>
+            </div>    
+        </div>
+    </div>
+    <script src="js/game.js"></script>
+    <script>
+        const gameRegion = document.querySelector(".game_region");
+        gameRegion.addEventListener("mousedown",()=>{
+            gameRegion.style.cursor = "url('img/hammer232.png') 4 4, auto";
+        });
+        gameRegion.addEventListener("mouseup",()=>{
+            gameRegion.style.cursor = "url('img/hammer32.png') 4 4, auto";
+        });
+        
+    </script>
+</body>
+</html>

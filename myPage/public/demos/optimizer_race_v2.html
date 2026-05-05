@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Optimizer Lab v3.5 | 深度學習優化器實驗室</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMath()"></script>
+
+    <script>
+        function initMath() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --border-color: #334155;
+
+            --color-sgd: #ff2a6d;
+            --color-momentum: #05d5fa;
+            --color-nesterov: #ff9f1c;
+            --color-adagrad: #f7ea48;
+            --color-rmsprop: #e056fd;
+            --color-adam: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0; z-index: 10;
+        }
+
+        h1 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
+        .subtitle { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .main-container {
+            display: flex; flex: 1; gap: 15px; padding: 15px;
+            overflow: hidden; max-width: 1600px; margin: 0 auto; width: 100%;
+        }
+
+        .left-col { flex: 0 0 520px; display: flex; flex-direction: column; gap: 15px; height: 100%; }
+
+        .canvas-card {
+            background: #000; border-radius: 12px; border: 1px solid var(--border-color);
+            position: relative; overflow: hidden; flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        canvas { display: block; width: 100%; height: auto; cursor: crosshair; }
+
+        .click-guide {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem;
+            backdrop-filter: blur(4px); pointer-events: none;
+            display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 5;
+        }
+
+        .status-badge {
+            position: absolute; top: 15px; right: 15px;
+            padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: none; z-index: 5;
+        }
+        .status-finished { color: #4ade80; border: 1px solid #4ade80; display: block; }
+        .status-timeout { color: #facc15; border: 1px solid #facc15; display: block; }
+
+        .terrain-info {
+            position: absolute; bottom: 10px; right: 10px; font-size: 0.75rem;
+            color: rgba(255,255,255,0.9); background: rgba(0,0,0,0.5);
+            padding: 4px 8px; border-radius: 4px; pointer-events: none;
+            text-align: right;
+        }
+
+        .terrain-legend {
+            position: absolute; bottom: 10px; left: 10px;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            padding: 8px 12px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+        .legend-title { font-size: 0.7rem; color: #ddd; margin-bottom: 4px; font-weight: 600; }
+        .legend-gradient {
+            width: 120px; height: 10px; border-radius: 2px;
+            background: linear-gradient(to right, #020617 0%, #22c55e 50%, #ffffff 100%);
+            margin-bottom: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .legend-labels {
+            display: flex; justify-content: space-between; width: 120px;
+            font-size: 0.65rem; color: #aaa;
+        }
+
+        .controls-card {
+            background: var(--bg-panel); border-radius: 12px; padding: 15px;
+            border: 1px solid var(--border-color); display: flex; flex-direction: column;
+            gap: 12px; flex: 1; overflow-y: auto;
+        }
+
+        .control-row { display: flex; gap: 10px; align-items: center; }
+        .control-col { flex: 1; }
+
+        .section-title {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-secondary); font-weight: 600; margin-bottom: 5px; display: block;
+        }
+
+        select, input[type="number"] {
+            width: 100%; background: var(--bg-card); color: white; border: 1px solid var(--border-color);
+            padding: 8px; border-radius: 6px; font-size: 0.9rem; outline: none;
+        }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        button {
+            border: none; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.2s; color: white;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .btn-start { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-start:hover { filter: brightness(1.1); }
+        .btn-start.paused { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-step { background: var(--bg-card); border: 1px solid var(--border-color); }
+        .btn-step:hover { background: var(--border-color); }
+        .btn-reset { background: var(--bg-card); color: #ef4444; border: 1px solid var(--border-color); }
+
+        .monitor-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 0.8rem; }
+        .monitor-table th { text-align: left; color: var(--text-secondary); padding: 0 8px; font-size: 0.7rem; }
+        .monitor-table td { background: rgba(255,255,255,0.03); padding: 6px 8px; }
+        .monitor-table tr td:first-child { border-radius: 4px 0 0 4px; }
+        .monitor-table tr td:last-child { border-radius: 0 4px 4px 0; }
+
+        .velocity-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 4px; border-radius: 2px; }
+        .velocity-fill { height: 100%; transition: width 0.1s linear; border-radius: 2px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px; padding: 10px; font-size: 0.75rem; color: #93c5fd;
+            line-height: 1.4; margin-top: auto;
+        }
+        .info-title { font-weight: 700; margin-bottom: 4px; display: block; color: #bfdbfe; }
+
+        .right-col {
+            flex: 1; background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .scroll-content { padding: 15px; overflow-y: auto; flex: 1; }
+
+        .algo-card {
+            background: var(--bg-card); border-radius: 6px; padding: 12px; margin-bottom: 10px;
+            border-left: 3px solid currentColor;
+        }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .card-title { font-weight: 700; font-size: 0.9rem; color: #fff; }
+        .math-box {
+            background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px;
+            margin-top: 6px; font-size: 0.85rem; overflow-x: auto; color: #e2e8f0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <h1>Neural Optimizer Lab v3.5</h1>
+            <div class="subtitle">視覺修復版：正確對應谷底與顏色 (Valley = Dark)</div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Interactive Education</div>
+    </header>
+
+    <div class="main-container">
+        <!-- 左側 -->
+        <div class="left-col">
+            <div class="canvas-card">
+                <canvas id="mainCanvas" width="520" height="400"></canvas>
+                <div class="click-guide"><span>🖱️</span> 點擊設定起點</div>
+                <div id="statusBadge" class="status-badge"></div>
+
+                <div class="terrain-legend">
+                    <div class="legend-title">Height Map (Loss)</div>
+                    <div class="legend-gradient"></div>
+                    <div class="legend-labels">
+                        <span>Low (Minima)</span>
+                        <span>High (Peak)</span>
+                    </div>
+                </div>
+
+                <div class="terrain-info" id="terrainMath">Loading...</div>
+            </div>
+
+            <div class="controls-card">
+                <div class="control-row">
+                    <div class="control-col">
+                        <span class="section-title">選擇地形 (Terrain)</span>
+                        <select id="terrainSelect">
+                            <option value="valley">Ravine (峽谷)</option>
+                            <option value="bowl">Bowl (碗狀)</option>
+                            <option value="saddle">Saddle (鞍點)</option>
+                            <option value="multi">Multi-Peak (多峰)</option>
+                        </select>
+                    </div>
+                    <div class="control-col" style="flex: 0 0 100px;">
+                        <span class="section-title">Max Steps</span>
+                        <input type="number" id="maxIterInput" value="500" min="100" max="5000">
+                    </div>
+                </div>
+
+                <div>
+                    <span class="section-title">操作控制</span>
+                    <div class="btn-group">
+                        <button class="btn-start" id="startBtn">▶ Run</button>
+                        <button class="btn-step" id="stepBtn">⏯ Step</button>
+                        <button class="btn-reset" id="resetBtn">↺ Reset</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span class="section-title">Learning Rate (<span style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.1em;">&eta;</span>)</span>
+                        <span id="lrValue" style="font-family:monospace; color:var(--accent-primary);">0.020</span>
+                    </div>
+                    <input type="range" id="lr" min="0.001" max="0.1" step="0.001" value="0.02" style="width:100%;">
+                </div>
+
+                <div>
+                    <span class="section-title">即時監控 (Real-time Monitor)</span>
+                    <table class="monitor-table">
+                        <thead>
+                            <tr>
+                                <th width="25%">Algo</th>
+                                <th width="15%">Scale</th>
+                                <th width="15%">Steps</th>
+                                <th width="45%">Speed (px)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monitorBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="info-box">
+                    <span class="info-title">ℹ️ 關於 Scale (視覺補償)</span>
+                    由於 Adam/RMSprop 內部有除法歸一化，導致數值遠小於 SGD。為了在同一畫面比較，我們給予不同倍率補償：
+                    <br>• <strong>SGD/Momentum</strong>: x100 (依賴梯度大小)
+                    <br>• <strong>Adam/RMSprop</strong>: x180 (依賴步長設定)
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：數學公式 -->
+        <div class="right-col">
+            <div class="scroll-content">
+                <!-- SGD -->
+                <div class="algo-card" style="color: var(--color-sgd);">
+                    <div class="card-header"><span class="card-title">SGD</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">基礎梯度下降。</div>
+                    <div class="math-box">$$ \theta_{t+1} = \theta_t - \eta \cdot \nabla J(\theta_t) $$</div>
+                </div>
+
+                <!-- Momentum -->
+                <div class="algo-card" style="color: var(--color-momentum);">
+                    <div class="card-header"><span class="card-title">Momentum</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">引入速度變數 $v$，具有慣性。</div>
+                    <div class="math-box">
+                        $$ v_t = \gamma v_{t-1} + \eta \nabla J(\theta_t) $$
+                        $$ \theta_{t+1} = \theta_t - v_t $$
+                    </div>
+                </div>
+
+                <!-- Nesterov -->
+                <div class="algo-card" style="color: var(--color-nesterov);">
+                    <div class="card-header"><span class="card-title">Nesterov (NAG)</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">預先計算下一步的梯度 (Look-ahead)。</div>
+                    <div class="math-box">
+                        $$ v_t = \gamma v_{t-1} + \eta \nabla J(\theta_t - \gamma v_{t-1}) $$
+                        $$ \theta_{t+1} = \theta_t - v_t $$
+                    </div>
+                </div>
+
+                <!-- Adagrad -->
+                <div class="algo-card" style="color: var(--color-adagrad);">
+                    <div class="card-header"><span class="card-title">Adagrad</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">累積歷史梯度平方 $G_t$。</div>
+                    <div class="math-box">
+                        $$ G_t = G_{t-1} + (\nabla J)^2 $$
+                        $$ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{G_t+\epsilon}} \nabla J $$
+                    </div>
+                </div>
+
+                <!-- RMSprop -->
+                <div class="algo-card" style="color: var(--color-rmsprop);">
+                    <div class="card-header"><span class="card-title">RMSprop</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">使用指數加權平均限制歷史影響。</div>
+                    <div class="math-box">
+                        $$ E[g^2]_t = \beta E[g^2]_{t-1} + (1-\beta)(\nabla J)^2 $$
+                        $$ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{E[g^2]_t+\epsilon}} \nabla J $$
+                    </div>
+                </div>
+
+                <!-- Adam -->
+                <div class="algo-card" style="color: var(--color-adam);">
+                    <div class="card-header"><span class="card-title">Adam</span></div>
+                    <div style="font-size:0.85rem; color:#ccc;">結合一階矩 $m_t$ 與二階矩 $v_t$。</div>
+                    <div class="math-box">
+                        $$ m_t = \beta_1 m_{t-1} + (1-\beta_1) \nabla J $$
+                        $$ v_t = \beta_2 v_{t-1} + (1-\beta_2) (\nabla J)^2 $$
+                        $$ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t}+\epsilon} \hat{m}_t $$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    let isRunning = false;
+    let animationId;
+    let iter = 0;
+    let maxIter = 500;
+    let optimizers = [];
+    let baseLr = 0.02;
+    const TARGET_THRESHOLD = 5;
+
+    const TERRAINS = {
+        valley: {
+            name: "Ravine (峽谷)",
+            formula: "$0.1x^2 + 2y^2$",
+            scale: 28,
+            start: {x: 60, y: 360},
+            loss: (x, y) => 0.1*x*x + 2*y*y,
+            grad: (x, y) => ({dx: 0.2*x, dy: 4*y})
+        },
+        bowl: {
+            name: "Bowl (碗狀)",
+            formula: "$x^2 + y^2$",
+            scale: 35,
+            start: {x: 50, y: 50},
+            loss: (x, y) => x*x + y*y,
+            grad: (x, y) => ({dx: 2*x, dy: 2*y})
+        },
+        saddle: {
+            name: "Saddle (鞍點)",
+            formula: "$x^2 - y^2$",
+            scale: 30,
+            start: {x: 450, y: 200},
+            loss: (x, y) => x*x - y*y,
+            grad: (x, y) => ({dx: 2*x, dy: -2*y})
+        },
+        multi: {
+            name: "Multi-Peak (多峰)",
+            formula: "$0.5(x^2+y^2) - 20\\cos(x) - 20\\cos(y)$",
+            scale: 25,
+            start: {x: 50, y: 350},
+            loss: (x, y) => 0.5 * (x*x + y*y) - 20 * Math.cos(x/2) - 20 * Math.cos(y/2),
+            grad: (x, y) => ({
+                dx: x + 10 * Math.sin(x/2),
+                dy: y + 10 * Math.sin(y/2)
+            })
+        }
+    };
+
+    let currentTerrainKey = 'valley';
+    let terrain = TERRAINS['valley'];
+
+    const monitorBody = document.getElementById('monitorBody');
+    const startBtn = document.getElementById('startBtn');
+    const terrainSelect = document.getElementById('terrainSelect');
+    const terrainMath = document.getElementById('terrainMath');
+    const maxIterInput = document.getElementById('maxIterInput');
+    const statusBadge = document.getElementById('statusBadge');
+
+    function toMath(cx, cy) {
+        return {
+            x: (cx - width/2) / terrain.scale,
+            y: (cy - height/2) / terrain.scale
+        };
+    }
+
+    let bgImageData = null;
+
+    function precomputeBackground() {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+
+        for (let py = 0; py < height; py++) {
+            for (let px = 0; px < width; px++) {
+                const m = toMath(px, py);
+                const val = terrain.loss(m.x, m.y);
+
+                let norm = 0;
+                if (currentTerrainKey === 'valley') {
+                    norm = val / 200;
+                } else if (currentTerrainKey === 'bowl') {
+                    norm = val / 150;
+                } else if (currentTerrainKey === 'saddle') {
+                    norm = (val + 100) / 200;
+                } else if (currentTerrainKey === 'multi') {
+                    norm = (val + 40) / 140;
+                }
+
+                norm = Math.max(0, Math.min(1, norm));
+
+                let r, g, b;
+                if (norm < 0.5) {
+                    let t = norm * 2;
+                    r = 2 + t * (34 - 2);
+                    g = 6 + t * (197 - 6);
+                    b = 23 + t * (94 - 23);
+                } else {
+                    let t = (norm - 0.5) * 2;
+                    r = 34 + t * (255 - 34);
+                    g = 197 + t * (255 - 197);
+                    b = 94 + t * (255 - 94);
+                }
+
+                const interval = currentTerrainKey === 'multi' ? 10 : 5;
+                const distToLine = Math.abs(val) % interval;
+                if (distToLine < 0.5 || (interval - distToLine) < 0.5) {
+                    r += 30; g += 30; b += 30;
+                }
+
+                const idx = (py * width + px) * 4;
+                data[idx] = Math.min(255, r);
+                data[idx+1] = Math.min(255, g);
+                data[idx+2] = Math.min(255, b);
+                data[idx+3] = 255;
+            }
+        }
+        bgImageData = imageData;
+    }
+
+    function drawScene() {
+        if (!bgImageData) precomputeBackground();
+        ctx.putImageData(bgImageData, 0, 0);
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.beginPath(); ctx.moveTo(0, height/2); ctx.lineTo(width, height/2); ctx.moveTo(width/2, 0); ctx.lineTo(width/2, height); ctx.stroke();
+
+        const start = optimizers.length > 0 ? {x: optimizers[0].startX, y: optimizers[0].startY} : terrain.start;
+        ctx.strokeStyle = '#fff'; ctx.setLineDash([4, 4]);
+        ctx.strokeRect(start.x-8, start.y-8, 16, 16);
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#fff'; ctx.font = '12px Inter'; ctx.fillText("Start", start.x-14, start.y+24);
+    }
+
+    class Optimizer {
+        constructor(name, colorVar, x, y, visualScale) {
+            this.name = name;
+            this.color = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
+            this.x = x; this.y = y; this.startX = x; this.startY = y;
+            this.visualScale = visualScale;
+            this.path = [{x,y}]; this.finished = false; this.active = true; this.stepSize = 0;
+            this.finishIter = 0;
+            this.vx=0; this.vy=0; this.cX=0; this.cY=0;
+            this.mX=0; this.mY=0; this.vX=0; this.vY=0; this.t=0;
+        }
+
+        applyMove(dx, dy) {
+            if (this.finished || !this.active) { this.stepSize = 0; return; }
+            const oldX = this.x; const oldY = this.y;
+            this.x -= dx; this.y -= dy;
+            if (this.x < -100 || this.x > width+100 || this.y < -100 || this.y > height+100) this.active = false;
+
+            const dist = Math.sqrt(Math.pow(this.x - width/2, 2) + Math.pow(this.y - height/2, 2));
+            if (dist < TARGET_THRESHOLD && (currentTerrainKey === 'valley' || currentTerrainKey === 'bowl')) {
+                this.finished = true;
+                this.finishIter = iter;
+            }
+
+            this.stepSize = Math.sqrt(Math.pow(this.x - oldX, 2) + Math.pow(this.y - oldY, 2));
+            if (this.stepSize < 0.005 && iter > 5) {
+                this.finished = true;
+                this.finishIter = iter;
+            }
+
+            this.path.push({x: this.x, y: this.y});
+        }
+
+        draw() {
+            if (!this.active && !this.finished && this.path.length < 2) return;
+            ctx.shadowBlur = 6; ctx.shadowColor = this.color;
+            ctx.beginPath(); ctx.strokeStyle = this.color; ctx.lineWidth = 2;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+            if (this.path.length > 0) { ctx.moveTo(this.path[0].x, this.path[0].y); for(let i=1;i<this.path.length;i++) ctx.lineTo(this.path[i].x, this.path[i].y); }
+            ctx.stroke();
+            ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
+        }
+    }
+
+    function getGrad(x, y) {
+        const m = toMath(x, y);
+        return terrain.grad(m.x, m.y);
+    }
+
+    const Algos = {
+        SGD: (o, lr) => { const g = getGrad(o.x, o.y); o.applyMove(lr*g.dx*o.visualScale, lr*g.dy*o.visualScale); },
+        Momentum: (o, lr) => { const g = getGrad(o.x, o.y); o.vx = 0.9*o.vx + lr*g.dx*o.visualScale; o.vy = 0.9*o.vy + lr*g.dy*o.visualScale; o.applyMove(o.vx, o.vy); },
+        Nesterov: (o, lr) => {
+            const laX = o.x - 0.9*o.vx; const laY = o.y - 0.9*o.vy;
+            const m = toMath(laX, laY); const g = terrain.grad(m.x, m.y);
+            o.vx = 0.9*o.vx + lr*g.dx*o.visualScale; o.vy = 0.9*o.vy + lr*g.dy*o.visualScale;
+            o.applyMove(o.vx, o.vy);
+        },
+        Adagrad: (o, lr) => {
+            const g = getGrad(o.x, o.y); o.cX += g.dx**2; o.cY += g.dy**2;
+            o.applyMove( (lr/(Math.sqrt(o.cX)+1e-8))*g.dx*o.visualScale, (lr/(Math.sqrt(o.cY)+1e-8))*g.dy*o.visualScale );
+        },
+        RMSprop: (o, lr) => {
+            const g = getGrad(o.x, o.y); o.cX = 0.99*o.cX + 0.01*g.dx**2; o.cY = 0.99*o.cY + 0.01*g.dy**2;
+            o.applyMove( (lr/(Math.sqrt(o.cX)+1e-8))*g.dx*o.visualScale, (lr/(Math.sqrt(o.cY)+1e-8))*g.dy*o.visualScale );
+        },
+        Adam: (o, lr) => {
+            o.t++; const g = getGrad(o.x, o.y);
+            o.mX = 0.9*o.mX + 0.1*g.dx; o.mY = 0.9*o.mY + 0.1*g.dy;
+            o.vX = 0.999*o.vX + 0.001*g.dx**2; o.vY = 0.999*o.vY + 0.001*g.dy**2;
+            const mhX = o.mX/(1-0.9**o.t); const mhY = o.mY/(1-0.9**o.t);
+            const vhX = o.vX/(1-0.999**o.t); const vhY = o.vY/(1-0.999**o.t);
+            o.applyMove( (baseLr*mhX/(Math.sqrt(vhX)+1e-8))*o.visualScale, (baseLr*mhY/(Math.sqrt(vhY)+1e-8))*o.visualScale );
+        }
+    };
+
+    function init() {
+        const start = terrain.start;
+        optimizers = [
+            new Optimizer('SGD', '--color-sgd', start.x, start.y, 100),
+            new Optimizer('Momentum', '--color-momentum', start.x, start.y, 100),
+            new Optimizer('Nesterov', '--color-nesterov', start.x, start.y, 100),
+            new Optimizer('Adagrad', '--color-adagrad', start.x, start.y, 140),
+            new Optimizer('RMSprop', '--color-rmsprop', start.x, start.y, 180),
+            new Optimizer('Adam', '--color-adam', start.x, start.y, 180)
+        ];
+
+        optimizers[0].update = function(lr) { Algos.SGD(this, lr); };
+        optimizers[1].update = function(lr) { Algos.Momentum(this, lr); };
+        optimizers[2].update = function(lr) { Algos.Nesterov(this, lr); };
+        optimizers[3].update = function(lr) { Algos.Adagrad(this, lr); };
+        optimizers[4].update = function(lr) { Algos.RMSprop(this, lr); };
+        optimizers[5].update = function(lr) { Algos.Adam(this, lr); };
+
+        iter = 0;
+        statusBadge.style.display = 'none';
+        bgImageData = null;
+        drawScene();
+        updateUI();
+
+        terrainMath.innerHTML = `Loss: ${terrain.formula}`;
+        if (window.renderMathInElement) initMath();
+    }
+
+    function updateUI() {
+        monitorBody.innerHTML = '';
+        optimizers.forEach(opt => {
+            const row = document.createElement('tr');
+            const widthPct = Math.min(100, (opt.stepSize / 25) * 100);
+
+            let stepsDisplay = '';
+            if (opt.finished) {
+                stepsDisplay = `<span style="color:#4ade80; font-weight:bold;">${opt.finishIter}</span>`;
+            } else if (!opt.active) {
+                stepsDisplay = `<span style="color:#ef4444;">Failed</span>`;
+            } else {
+                if (iter >= maxIter) {
+                    stepsDisplay = `<span style="color:#facc15;">${iter}+</span>`;
+                } else {
+                    stepsDisplay = `<span style="color:#94a3b8;">${iter}</span>`;
+                }
+            }
+
+            row.innerHTML = `
+                <td><div style="display:flex;align-items:center;font-weight:500;"><div class="dot" style="background:${opt.color};"></div>${opt.name}</div></td>
+                <td><span style="font-family:monospace;font-size:0.7rem;opacity:0.7;">x${opt.visualScale}</span></td>
+                <td>${stepsDisplay}</td>
+                <td>
+                    <div style="font-size:0.7rem;">${opt.stepSize.toFixed(1)}</div>
+                    <div class="velocity-track"><div class="velocity-fill" style="width:${widthPct}%; background:${opt.color}; box-shadow:0 0 5px ${opt.color};"></div></div>
+                </td>
+            `;
+            monitorBody.appendChild(row);
+        });
+    }
+
+    function step() {
+        iter++; let active = false;
+        optimizers.forEach(opt => { opt.update(baseLr); if(!opt.finished && opt.active) active = true; });
+        drawScene(); optimizers.forEach(opt => opt.draw()); updateUI(); return active;
+    }
+
+    function loop() {
+        if (!isRunning) return;
+        const keep = step();
+        if (iter >= maxIter) { togglePlay(false); showStatus('TIMEOUT', 'timeout'); return; }
+        if (!keep) { togglePlay(false); showStatus('FINISHED', 'finished'); }
+        else { animationId = requestAnimationFrame(loop); }
+    }
+
+    function showStatus(text, type) {
+        statusBadge.textContent = text;
+        statusBadge.className = 'status-badge status-' + type;
+        statusBadge.style.display = 'block';
+    }
+
+    function togglePlay(state) {
+        isRunning = state;
+        if(state) {
+            statusBadge.style.display = 'none'; startBtn.innerHTML = '⏸ Pause'; startBtn.classList.add('paused'); loop();
+        } else {
+            startBtn.innerHTML = '▶ Run'; startBtn.classList.remove('paused'); cancelAnimationFrame(animationId);
+        }
+    }
+
+    startBtn.addEventListener('click', () => {
+        if(optimizers.length===0) init();
+        if (iter >= maxIter && !isRunning) { maxIter += 500; maxIterInput.value = maxIter; }
+        togglePlay(!isRunning);
+    });
+
+    document.getElementById('stepBtn').addEventListener('click', () => { if(optimizers.length===0) init(); togglePlay(false); step(); });
+    document.getElementById('resetBtn').addEventListener('click', () => { togglePlay(false); init(); });
+    document.getElementById('lr').addEventListener('input', (e) => { baseLr = parseFloat(e.target.value); document.getElementById('lrValue').innerText = baseLr.toFixed(3); });
+
+    terrainSelect.addEventListener('change', (e) => {
+        currentTerrainKey = e.target.value; terrain = TERRAINS[currentTerrainKey];
+        togglePlay(false); init();
+    });
+
+    maxIterInput.addEventListener('change', (e) => { maxIter = parseInt(e.target.value); });
+
+    canvas.addEventListener('mousedown', (e) => {
+        if(iter > 0) return;
+        const r = canvas.getBoundingClientRect();
+        const nx = e.clientX - r.left; const ny = e.clientY - r.top;
+        optimizers.forEach(o => { o.x = nx; o.y = ny; o.startX = nx; o.startY = ny; });
+        terrain.start = {x: nx, y: ny}; drawScene();
+    });
+
+    init();
+</script>
+</body>
+</html>

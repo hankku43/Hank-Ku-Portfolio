@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 後端: FastAPI — 開放 8000 供瀏覽器 / 工具直接呼叫
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mypage_backend_dev
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - CORS_ORIGINS=["*"]
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # 模型權重透過 volume 掛載，避免塞進 image
+      - ./backend/models:/app/models
+
+  # 前端: Vite 開發伺服器 — 支援 HMR 熱重載
+  frontend:
+    build:
+      context: ./myPage
+      dockerfile: Dockerfile.dev
+    container_name: mypage_frontend_dev
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      # Vite proxy 目標指向容器內的 backend service name
+      - VITE_PROXY_TARGET=http://backend:8000
+    volumes:
+      - ./myPage:/app          # 掛載原始碼，讓 HMR 生效
+      - /app/node_modules      # 保留容器內的 node_modules 不被本機覆蓋
+    depends_on:
+      - backend

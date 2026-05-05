@@ -1,0 +1,1098 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* cursor: url(../img/hammer32.png) 4 4, auto; */
+}
+
+
+
+.game_region{
+    width: 500px;
+    height: 515px;
+    cursor: url(../img/hammer32.png) 4 4, auto;
+}
+
+.game_initial_page{
+    background-image: url(../img/initialpage.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* left: 50%;
+    top: 39%; */
+    /* transform: translate(-50%, -50%); */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* 讓按鈕靠底部 */
+}
+
+    #initial_button{
+        background-color: #e60000; /* 紅色背景 */
+        color: white; /* 文字顏色 */
+        border: none;
+        padding: 15px 30px; /* 按鈕內間距 */
+        font-size: 20px; /* 文字大小 */
+        font-weight: bold;
+        /* text-transform: uppercase; 文字大寫 */
+        border-radius: 10px; /* 圓角 */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); /* 陰影 */
+        cursor: url(../img/hammer32.png) 4 4, auto;
+        transition: all 0.3s ease; /* 過渡效果 */
+        outline: none; /* 移除默認的focus邊框 */
+        margin-bottom: 100px;
+        text-align: center;
+    }
+
+    /* 按鈕懸停效果 */
+    #initial_button:hover {
+        background-color: #cc0000; /* 懸停時更深的紅色 */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* 加強陰影 */
+        transform: translateY(-3px); /* 輕微向上移動 */
+    }
+
+    /* 按鈕被點擊時效果 */
+    #initial_button:active {
+        background-color: #b30000; /* 點擊時更深的紅色 */
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4); /* 減弱陰影 */
+        transform: translateY(1px); /* 輕微向下移動 */
+        cursor: url(../img/hammer232.png) 4 4, auto;
+    }
+
+
+.entry{
+    width: 500px;
+    height: 515px;
+    position: absolute;
+    z-index: 30;
+    /* background-color: rgba(255, 255, 255, 0.75); */
+    background-image: url(../img/entry_background.png);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+    .title_region{
+        display: flex;
+        justify-content: center;
+        align-content: flex-start;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 50%;
+    }
+
+    .title_container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* background-image: url(../img/woodboard.png); */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 80%;
+        height: 46%;
+        flex-wrap: wrap;
+    }
+
+    .title_region h1{
+        margin-top: 75px;
+        margin-bottom: 13px;
+        width: 100%;
+        text-align: center;
+        font-weight: 900;
+    }
+
+    .title_region h2{
+        width: 100%;
+        margin-top: 0px;
+        margin-bottom: 4px;
+        text-align: center;
+        font-weight: 900;
+    }
+
+
+    #mode{
+        width: 100%;
+        text-align: center;
+        font-weight: bolder;
+    }
+
+    .buttom_region{
+        width: 100%;
+        height: 50%;
+    }
+
+    .startgame_buttom_region,
+    .introduce_buttom_region,
+    .setting_buttom_region{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 30%;
+    }
+
+    .startgame_buttom,
+    .introduce_buttom,
+    .setting_buttom{
+        width: 25%;
+        height: 83%;
+        background-image: url(../img/woodboard.png);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: float1 2s infinite ease-in-out;
+    }
+
+    @keyframes float1 {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    .startgame_buttom:hover,
+    .introduce_buttom:hover,
+    .setting_buttom:hover{
+        animation-play-state: paused;
+    }
+
+
+    .startgame_buttom span,
+    .introduce_buttom span,
+    .setting_buttom span{
+        text-align: center;
+        font-weight: bold; 
+    }
+
+
+.game_introduce{
+    width: 500px;
+    height: 550px;
+    position: absolute;
+    z-index: 30;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+    
+    .roleintroduce{
+        width: 100%;
+        height: 40%;
+    }
+
+    .roleintroduce h1{
+        margin: 60px 5% 10px 5%;
+    }
+
+    .roleintroduce p{
+        margin: 10px 5%;
+        text-align: justify;
+        font-weight: bold;
+    }
+
+    .gopher_introduce{
+    width: 100%;
+    height: 60%;
+    position: absolute;
+    bottom: 0px;
+    }
+
+    .gopher_introduce h1{
+        margin: 0 5%;
+    }
+
+    .badgopherintroduce_region,
+    .goodgopherintroduce_region{
+        width: 90%;
+        height: 25%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5%;
+
+    }
+
+    .introduceGopherImgContainer{
+        height: 60px;
+        width: 60px;
+    }
+
+    .introduceGopherImgContainer img{
+        height: 60px;
+        width: 60px;
+    }
+
+    .badgopherintroduce,
+    .goodgopherintroduce{
+        padding-left: 5%;
+        text-align: justify;
+        font-weight: bold;
+    }
+
+.back_button{
+    position: absolute;
+    top: 12px;
+    left: 0;
+    z-index: 50;
+    background-image: url(../img/back2.png);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* background-color: brown; */
+    /* border: 2px solid brown; */
+    /* border-radius: 10px; */
+    width: 70px;
+    height: 50px;
+    animation: float2 1.5s infinite ease-in-out;
+}
+
+    .back_button:hover {
+        animation-play-state: paused;
+    }
+
+
+
+    @keyframes float2{
+        0%{
+            top: 12px;
+        }
+        50%{
+            top: 8px;
+        }
+        100%{
+            top: 12px;
+        }
+    }
+
+
+
+
+
+
+.gamesetting{
+    width: 500px;
+    height: 550px;
+    position: absolute;
+    z-index: 30;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+    .difficultyselector_region{
+        width: 100%;
+        height: 40%;
+    }
+
+    .difficultyselector_region h1{
+        margin: 60px 5% 0 5%;
+    }
+
+    .difficulty_button_container{
+        display: flex;
+        align-items: center;
+        height: 30%;
+        justify-content: space-evenly;
+    }
+
+    .difficulty_button{
+        border: 3px solid transparent;
+        border-radius: 15px;
+        background-image: linear-gradient(#0000006c,#0000006c),
+                        linear-gradient(#BDBDBD 5%, #B0B0B0,#B0B0B0 ,#B0B0B0 5%, #E6E6E6 35%,#bebdbd,#8a8a8a, #6F6F6F,#7a7a7a),
+                        linear-gradient(#c9c9c9,#E6E6E6 25%,#9a9a9a,#7A7A7A,#616161);
+                        
+        background-clip: border-box, padding-box, border-box;
+        background-origin: border-box, padding-box, border-box;
+        box-shadow: 0px 3px 6px rgba(40, 40, 40, 0.2);
+        text-align: center;
+        width: 20%;
+        height: 50px;
+        font-weight: bold;
+        cursor: url(../img/hammer32.png) 4 4, auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0.8;
+    }
+
+    .difficulty_button p{
+        text-align: center;
+        /* text-shadow: 0px 0.5px 1.2px #ffffff, 0px 0px 0px #000000, 0px 0.5px 2px #ffffff, 0px 0.5px 0px #ffffff; */
+        color: rgba(26, 26, 26, 0.51);
+        font-size: 20px;
+        font-weight:900;
+    }
+
+    .difficulty_button:hover{
+        opacity: 1;
+        background-image:   linear-gradient(#BDBDBD 5%, #B0B0B0,#B0B0B0 ,#B0B0B0 5%, #E6E6E6 35%,#bebdbd,#8a8a8a, #6F6F6F,#7a7a7a),
+                            linear-gradient(#c9c9c9,#E6E6E6 25%,#9a9a9a,#7A7A7A,#616161);
+                            background-clip: padding-box, border-box;
+                            background-origin: padding-box, border-box;
+    }
+
+    .difficulty_button:active{
+        opacity: 1;
+        cursor: url(../img/hammer232.png) 4 4, auto;
+        background-image:   linear-gradient(#BDBDBD 5%, #B0B0B0,#B0B0B0 ,#B0B0B0 5%, #E6E6E6 35%,#bebdbd,#8a8a8a, #6F6F6F,#7a7a7a),
+                            linear-gradient(#c9c9c9,#E6E6E6 25%,#9a9a9a,#7A7A7A,#616161);
+        background-clip: padding-box, border-box;
+        background-origin: padding-box, border-box;
+    }
+
+    .difficulty_button:hover p{
+        text-align: center;
+        text-shadow: 0px 0.5px 1.2px #ffffff, 0px 0px 0px #000000, 0px 0.5px 2px #ffffff, 0px 0.5px 0px #ffffff;
+        color: rgba(111, 111, 111, 0.51);
+        font-size: 20px;
+        font-weight:900;
+    }
+
+
+    .current_active{
+        /* border: 5px solid black; */
+        opacity: 1;
+        background-image:   linear-gradient(#BDBDBD 5%, #B0B0B0,#B0B0B0 ,#B0B0B0 5%, #E6E6E6 35%,#bebdbd,#8a8a8a, #6F6F6F,#7a7a7a),
+                            linear-gradient(#c9c9c9,#E6E6E6 25%,#9a9a9a,#7A7A7A,#616161);
+        background-clip: padding-box, border-box;
+        background-origin: padding-box, border-box;
+    }
+
+    .current_active p{
+        text-align: center;
+        text-shadow: 0px 0.5px 1.2px #ffffff, 0px 0px 0px #000000, 0px 0.5px 2px #ffffff, 0px 0.5px 0px #ffffff;
+        color: rgba(111, 111, 111, 0.51);
+        font-size: 20px;
+        font-weight:900;
+    }
+
+    .volumesetting_region{
+        width: 100%;
+        height: 40%;
+    }
+
+    .volumesetting_region h1{
+        margin: 0px 5% 8% 5%;
+    }
+
+    .bgmsetting_region,
+    .soundeffectsetting_region{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        /* justify-content: center; */
+    }
+
+    .volumesetting_region h3{
+        margin: 2% 5%;
+        width: 20%;
+        height: 30%;
+        text-align: justify;
+    }
+
+    .volumesetting_region img{
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+    }
+
+    #bgm_volume{
+        text-align: center;
+        height: 20px;
+        font-size: 20px;
+        margin-left: 5%;
+    }
+
+    #sound_volume{
+        text-align: center;
+        height: 20px;
+        font-size: 20px;
+        margin-left: 5%;
+    }
+
+
+
+.time_and_score{
+    position: relative;
+    width: 100%;
+    height: 15px;
+    /* background-color: azure; */
+    display: flex;
+}
+
+.timer{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    font-weight: 500;
+}
+
+.score{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    font-weight: 500;
+
+}
+
+
+.getpoint{
+    position: absolute;
+    font-weight: bolder;
+    font-size: 40px;
+    color: rgb(54, 157, 209);
+    opacity: 1;
+    transition: transform 1s ease-out, opacity 1s ease-out;
+    z-index: 8;
+}
+
+
+.pass_page{
+    width: 500px;
+    height: 515px;
+    position: absolute;
+    z-index: 30;
+    /* background-color: rgba(255, 255, 255, 0.75); */
+    background-image: url(../img/pass_page_background.png);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* .pass_page h1{
+    width: 100%;
+    text-align: center;
+}
+
+.pass_page h3{
+    width: 100%;
+    text-align: center;
+} */
+
+.next_button{
+    text-align: center;
+    width: 62%;
+    height: 30%;
+    background-image: url(../img/woodboard.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float1 2s infinite ease-in-out;
+    box-shadow: 10px 10px 20px black;
+    position: relative;
+    bottom: -123px;
+    font-size: 36px;
+    font-weight: 900;
+}
+
+.fill_page{
+    width: 500px;
+    height: 515px;
+    position: absolute;
+    z-index: 30;
+    /* background-color: rgba(255, 255, 255, 0.75); */
+    background-image: url(../img/fill_page_background.png);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.fill_btn_container{
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.fill_btn_container div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 81%;
+    background-image: url(../img/woodboard.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: float1 2s infinite ease-in-out;
+    box-shadow: 10px 10px 20px black;
+    position: relative;
+}
+
+.fill_btn_container span{
+    text-align: center;
+    font-size: 31px;
+    font-weight: 900;
+}
+
+
+
+.win_page{
+    width: 500px;
+    height: 515px;
+    position: absolute;
+    z-index: 30;
+    /* background-color: rgba(255, 255, 255, 0.75); */
+    background-image: url(../img/win_page_background.png);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.back_to_entry_button{
+    text-align: center;
+    width: 62%;
+    height: 30%;
+    background-image: url(../img/woodboard.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float1 2s infinite ease-in-out;
+    box-shadow: 10px 10px 20px black;
+    position: relative;
+    bottom: -123px;
+    font-size: 36px;
+    font-weight: 900;
+}
+
+/* .win_page h1{
+    width: 100%;
+    text-align: center;
+}
+
+.win_page h3{
+    width: 100%;
+    text-align: center;
+} */
+
+.count_page{
+    width: inherit;
+    height: inherit;
+    position: absolute; 
+    z-index: 30;
+    /* background-color: rgba(255, 255, 255, 0.2); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.count_page_text_container{
+    width: 50px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.count_page_text_container span{
+    text-align: center;
+    font-size: 100px;
+    font-weight: 900;
+    text-shadow: -1px 0 black, 0 1px black,
+      1px 0 black, 0 -1px black;
+    color: orange;
+}
+
+.animate_big{
+    animation: big 1s linear infinite;
+}
+
+@keyframes big{
+    0%{
+        font-size: 50px;
+    }
+    50%{
+        font-size: 100px;
+    }
+    100%{
+        font-size: 100px;
+    }
+}
+
+.play_region{
+    width: 100%;
+    height: 500px;
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    grid-row-gap: 0px;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    background-image: url(../img/background.png);
+    background-size: cover;
+    position: relative;
+}
+
+.play_region::before{
+    content: "";
+    position: absolute;
+    background-image: url(../img/background1.png);
+    width: 100%;
+    height: 175.550px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    bottom: 0px;
+    z-index: 7;
+}
+
+.play_region::after{
+    content: "";
+    position: absolute;
+    background-image: url(../img/background2.png);
+    width: 100%;
+    height: 73.53px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    bottom: 175.54px;
+    z-index: 3;
+}
+
+.set{
+    width: 120px;
+    height:120px;
+    position: relative;
+    /* border: 3px solid ; */
+    margin: 0px;
+    top: 10px;
+}
+
+.hit_region{
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    /* border: 3px solid black; */
+    background-color: transparent;
+    top: 20%;
+    right: 25%;
+    z-index: 10;
+}
+
+.hammer{
+    display: none;
+}
+
+.small{
+    width: 80px;
+    height:80px;
+    position: relative;
+    /* border: 3px solid ; */
+    margin: 0px;
+    top: 45px;
+}
+
+.line{
+    height: 120px;
+    width: 120px;
+    background-color: transparent;
+    position: absolute;
+    top: 0px;
+
+}
+
+.small .line{
+    height: 80px;
+    width: 80px;
+    background-color: transparent;
+    position: absolute;
+    top: 0px;
+}
+
+.line::before{
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background-image: url(../img/uphole.png);
+    background-size: cover; 
+    background-repeat: no-repeat;
+    top: 0px;
+}
+
+
+.small .line::before{
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-image: url(../img/uphole.png);
+    background-size: cover; 
+    background-repeat: no-repeat;
+    top: 0px;
+}
+
+
+.line::after{
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 60px;
+    background-image: url(../img/downhole.png);
+    background-size: cover; 
+    background-repeat: no-repeat;
+    bottom: 0px;
+}
+
+.small .line::after{
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 40px;
+    background-image: url(../img/downhole.png);
+    background-size: cover; 
+    background-repeat: no-repeat;
+    bottom: 0px;
+}
+
+
+.gopher{
+    height: 60px;
+    width: 60px;
+    color: transparent;
+    position: relative;
+    top: 60%;
+    left: 25%;
+    user-select: none;
+    /* border: 3px solid black; */
+}
+
+.small .gopher{
+    height: 40px;
+    width: 40px;
+    color: transparent;
+    position: relative;
+    top: 60%;
+    left: 25%;
+    user-select: none;
+}
+
+.gopher img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    user-select: none;
+}
+
+
+.show{
+    animation: go_up 0.4s forwards linear;
+}
+
+.hide{
+    animation: go_down 0.2s forwards linear;
+}
+
+
+.play_region .set:nth-child(-n+3) .line::before
+{
+    z-index: 1;
+}
+
+
+.play_region .set:nth-child(-n+3) .gopher img{
+    z-index: 2;
+}
+
+
+.play_region .set:nth-child(-n+3) .line::after{
+    z-index: 4;
+}
+
+.play_region .set:nth-last-child(-n+3) .line::before{
+    z-index: 5;
+}
+
+.play_region .set:nth-last-child(-n+3) .gopher img{
+    z-index: 6;
+}
+
+
+.play_region .set:nth-last-child(-n+3) .line::after{
+    z-index: 8;
+}
+
+
+@keyframes go_up{
+    0%{
+        top: 60%;
+    }
+    100%{
+        top: 18%;
+    }
+}
+
+@keyframes go_down{
+    0%{
+        top: 18%;
+    }
+    100%{
+        top: 60%;
+    }
+
+}
+
+
+@media screen and (max-width: 500px){
+    .game_region,
+    .play_region,
+    .play_region::after,
+    .play_region::before,
+    .entry,
+    .game_introduce,
+    .gamesetting,
+    .pass_page,
+    .fill_page,
+    .win_page,
+    .game_initial_page{
+        width: 100%;
+    }
+
+    .game_initial_page,
+    .pass_page,
+    .fill_page,
+    .win_page{
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    
+    .play_region,
+    .play_region::after,
+    .play_region::before{
+        overflow: hidden;
+        background-position: center;
+    }
+
+    .set{
+        width: 80px;
+        height: 80px;
+        position: relative;
+        /* border: 3px solid ; */
+        margin: 0px;
+        top: 20.5px;
+    }
+    
+    .hit_region{
+        position: absolute;
+        width: 37.5px;
+        height: 37.5px;
+        /* border: 3px solid black; */
+        background-color: transparent;
+        top: 20%;
+        right: 25%;
+        z-index: 10;
+    }
+    
+
+
+    .small{
+        width: 60px;
+        height:60px;
+        position: relative;
+        /* border: 3px solid ; */
+        margin: 0px;
+        top: 28px;
+    }
+    
+    .line{
+        height: 90px;
+        width: 90px;
+        background-color: transparent;
+        position: absolute;
+        top: 0px;
+    
+    }
+    
+    .small .line{
+        height: 60px;
+        width: 60px;
+        background-color: transparent;
+        position: absolute;
+        top: 0px;
+    }
+    
+    .line::before{
+        content: "";
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        background-image: url(../img/uphole.png);
+        background-size: cover; 
+        background-repeat: no-repeat;
+        top: 0px;
+    }
+    
+    
+    .small .line::before{
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-image: url(../img/uphole.png);
+        background-size: cover; 
+        background-repeat: no-repeat;
+        top: 0px;
+    }
+    
+    
+    .line::after{
+        content: "";
+        position: absolute;
+        width: 90px;
+        height: 45px;
+        background-image: url(../img/downhole.png);
+        background-size: cover; 
+        background-repeat: no-repeat;
+        bottom: 0px;
+    }
+    
+    .small .line::after{
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 30px;
+        background-image: url(../img/downhole.png);
+        background-size: cover; 
+        background-repeat: no-repeat;
+        bottom: 0px;
+    }
+    
+    
+    .gopher{
+        height: 45px;
+        width: 45px;
+        color: transparent;
+        position: relative;
+        top: 67%;
+        left: 30%;
+        user-select: none;
+        /* border: 3px solid black; */
+    }
+    
+    .small .gopher{
+        height: 30px;
+        width: 30px;
+        color: transparent;
+        position: relative;
+        top: 60%;
+        left: 25%;
+        user-select: none;
+    }
+    
+    .gopher img{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        user-select: none;
+    }
+
+
+    .play_region .set:nth-child(4){
+        right: -15px;
+    }
+
+    .play_region .set:nth-child(5){
+        right: 6px;
+    }
+
+    .play_region .set:nth-child(6){
+        left: -23px;
+    }
+
+    .play_region .set:nth-child(4) .hit_region{
+        right: 14px;
+    }
+
+    .play_region .set:nth-child(5) .hit_region{
+        right: 13px;
+    }
+
+    .play_region .set:nth-child(6) .hit_region{
+        left: 24px;
+    }
+
+    .hammer{
+        display: none;
+        position: absolute;
+        z-index: 10;
+        width: 50px;
+        height: 50px;
+        background-image: url(../img/hammer2.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        top: -30px;
+        left: 2px;
+    }
+    
+
+    .hitting{
+        animation: hit 0.05s forwards linear;
+    }
+
+    @keyframes go_up{
+        0%{
+            top: 67%;
+        }
+        100%{
+            top: 18%;
+        }
+    }
+    
+    @keyframes go_down{
+        0%{
+            top: 18%;
+        }
+        100%{
+            top: 67%;
+        }
+    
+    }
+
+    @keyframes hit{
+        0%{
+            transform: rotate(0);
+        }
+
+        100%{
+            transform: rotate(-45deg);
+        }    
+    }
+
+
+}

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 後端: FastAPI — 僅供容器間通訊，不對外暴露
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mypage_backend
+    restart: always
+    environment:
+      # ⚠️  生產環境請替換為實際前端網域，例如:
+      # CORS_ORIGINS=["https://your-domain.com"]
+      - CORS_ORIGINS=${CORS_ORIGINS:-["*"]}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/models:/app/models
+
+  # 前端: 編譯後的 Vue 靜態檔 + Nginx 反向代理
+  frontend:
+    build:
+      context: ./myPage
+      dockerfile: Dockerfile
+    container_name: mypage_frontend
+    restart: always
+    ports:
+      - "80:80"    # HTTP
+      - "443:443"  # HTTPS (需先用 certbot 取得憑證)
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - backend
+
+  # Certbot: Let's Encrypt SSL 憑證簽發與自動更新
+  # 首次部署後執行: docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d your-domain.com
+  certbot:
+    image: certbot/certbot
+    container_name: mypage_certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
