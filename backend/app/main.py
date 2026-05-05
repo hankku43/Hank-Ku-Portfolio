@@ -1,9 +1,35 @@
+import asyncio
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routers import digit, ptt, nn, vehicle, classical_nlp, rag
 
-app = FastAPI(title="MyPage Portfolio API", version="1.0.0")
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    loop = asyncio.get_event_loop()
+
+    async def _preload(name, fn):
+        try:
+            await loop.run_in_executor(None, fn)
+            logger.info("Preloaded: %s", name)
+        except Exception as e:
+            logger.warning("Preload failed (%s): %s", name, e)
+
+    from app.models.classical_nlp_model import _load as load_nlp
+    from app.models.digit_model import _load as load_digit
+    await asyncio.gather(
+        _preload("classical_nlp", load_nlp),
+        _preload("digit", load_digit),
+    )
+    yield
+
+
+app = FastAPI(title="MyPage Portfolio API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

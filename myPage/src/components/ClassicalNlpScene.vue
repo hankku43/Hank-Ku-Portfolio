@@ -181,7 +181,12 @@ async function ask() {
     displayedTeacherText.value = ''
   } catch (e) {
     isLoading.value = false
-    if (currentGen === genId) errorMsg.value = `錯誤：${e.message}`
+    if (currentGen === genId) {
+      const msg = e?.message || ''
+      errorMsg.value = msg.includes('500')
+        ? '夫子正在準備中，請稍後片刻再試'
+        : '無法連線，請確認網路後再試'
+    }
   } finally {
     inputRef.value?.focus()
   }

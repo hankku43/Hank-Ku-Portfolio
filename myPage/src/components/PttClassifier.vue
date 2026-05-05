@@ -64,8 +64,11 @@ async function predict() {
         result.value = data;
         feedbackLabel.value = data.board;
         emit('status-change', '✓');
-    } catch {
-        errorMsg.value = '無法連線至後端，請確認 API 服務已啟動。';
+    } catch (e) {
+        const msg = e?.message || ''
+        errorMsg.value = msg.includes('500')
+            ? 'AI 模型初次載入中（約 30 秒），請稍後再試。'
+            : '無法連線，請確認網路後再試。'
         emit('status-change', '');
     } finally {
         isLoading.value = false;

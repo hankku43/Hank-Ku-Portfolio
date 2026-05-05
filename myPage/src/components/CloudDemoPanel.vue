@@ -130,7 +130,7 @@
             </div>
 
             <div v-else-if="modelStatus === 'error'" class="model-error">
-                ⚠️ 模型載入失敗，請確認 /tfjs_model_dir 路徑正確並重新整理頁面。
+                ⚠️ 模型載入失敗，請重新整理頁面，若問題持續請稍後再訪。
             </div>
 
             <template v-else>
