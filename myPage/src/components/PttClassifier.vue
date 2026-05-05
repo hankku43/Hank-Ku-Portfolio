@@ -68,7 +68,7 @@ async function predict() {
         const msg = e?.message || ''
         errorMsg.value = msg.includes('500')
             ? 'AI 模型初次載入中（約 30 秒），請稍後再試。'
-            : '無法連線，請確認網路後再試。'
+            : '模型首次啟動需要較長時間，請稍後片刻再重試。'
         emit('status-change', '');
     } finally {
         isLoading.value = false;
