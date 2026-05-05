@@ -32,6 +32,8 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - ./myPage/public/videos:/usr/share/nginx/html/videos
+      - ./myPage/public/tfjs_model_dir:/usr/share/nginx/html/tfjs_model_dir
     depends_on:
       - backend
     logging:
