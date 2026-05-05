@@ -1,7 +1,7 @@
 """
 Traffic law RAG model.
 Ported from dl_assignment/second level/week-7/rag.py
-Pipeline: CKIP tokenize → Doc2Vec similarity search → Ollama Gemma3 4B generation
+Pipeline: CKIP tokenize → Doc2Vec similarity search → Groq Llama 4 Scout generation
 Multi-stage fallback: direct search → synonym expansion → legal term conversion → HyDE
 """
 
@@ -146,7 +146,7 @@ def query_stream(question: str, top_k: int = 3):
     yield "status", "斷詞與語意向量化中..."
     try:
         search_results, query_words = _rag_search(question, top_k, score_filter=0.8, is_first=True)
-        yield "status", f"找到 {len(search_results)} 筆相關條文，呼叫 Gemma3 生成回答中..."
+        yield "status", f"找到 {len(search_results)} 筆相關條文，呼叫 Llama 4 Scout 生成回答中..."
         response = _generate_and_check(question, search_results)
         if response:
             yield "result", _build_output(question, response, search_results)
@@ -177,7 +177,7 @@ def query_stream(question: str, top_k: int = 3):
         new_query = f"{' '.join(query_words)} {refined}".strip()
         yield "status", f"策略 [{name}]：重新搜尋條文（閾值 {score}）..."
         search_results, _ = _rag_search(new_query, top_k, score_filter=score, is_first=False)
-        yield "status", f"策略 [{name}]：呼叫 Gemma3 生成回答中..."
+        yield "status", f"策略 [{name}]：呼叫 Llama 4 Scout 生成回答中..."
         is_hyde = "HyDE" in name
         response = _generate_and_check(question, search_results, fake_answer=new_query if is_hyde else None)
         if response:
