@@ -34,6 +34,7 @@ def _build_model():
     )
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
         weights=None,
+        weights_backbone=None,
         min_size=1200,
         max_size=1333,
         anchor_generator=anchor_generator,
