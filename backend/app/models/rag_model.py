@@ -53,14 +53,20 @@ class _LawTokenizer:
 
 # --- Core RAG helpers ---
 
-def _call_ollama(prompt: str) -> str:
-    from app.config import settings
-    resp = requests.post(
-        f"{settings.ollama_base_url}/api/generate",
-        json={"model": "gemma3:4b", "prompt": prompt, "stream": False},
-        timeout=60,
+def _call_groq(prompt: str) -> str:
+    import os
+    from groq import Groq
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY 未設定")
+    client = Groq(api_key=api_key)
+    completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=512,
     )
-    return resp.json().get("response", "")
+    return completion.choices[0].message.content
 
 
 def _clean_llm_output(text: str) -> str:
@@ -108,7 +114,7 @@ def _generate_and_check(user_query: str, search_results: list, fake_answer=None)
         prompt = f"這是一則錯誤訊息：{fake_answer}。請根據以下法規更正：\n{context}\n回答原問題：{user_query}"
     else:
         prompt = f"法規內容：\n{context}\n根據上述內容回答問題：{user_query}\n若無相關資訊請回答「無法回答」。"
-    response = _call_ollama(prompt)
+    response = _call_groq(prompt)
     if "無法回答" in response or "無相關資訊" in response:
         return None
     return response
@@ -150,13 +156,13 @@ def query_stream(question: str, top_k: int = 3):
         return
 
     strategies = [
-        ("同義詞擴充", 0.6, lambda qw: _call_ollama(
+        ("同義詞擴充", 0.6, lambda qw: _call_groq(
             f"請將下列單詞分別擴充成3個法律同義詞，例如：'手機'->'行動電話 手持裝置'。單詞：{qw}。僅回傳詞彙，用空白分隔，不要有標點或說明。"
         )),
-        ("法律用語轉換", 0.5, lambda qw: _call_ollama(
+        ("法律用語轉換", 0.5, lambda qw: _call_groq(
             f"請將此口語轉換為正式法律檢索詞，例如：'車禍'->'交通事故 碰撞'。內容：{qw}。僅回傳詞彙，不要底線、不要說明。"
         )),
-        ("HyDE", 0.4, lambda qw: _call_ollama(
+        ("HyDE", 0.4, lambda qw: _call_groq(
             f"請根據交通法規知識，簡單回答此問題：{question}。回答需包含正式法規術語。"
         )),
     ]

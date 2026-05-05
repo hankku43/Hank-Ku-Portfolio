@@ -18,3 +18,4 @@ ckip-transformers>=0.3.4
 # RAG endpoint
 pandas>=2.0.0
 requests>=2.31.0
+groq>=0.9.0
