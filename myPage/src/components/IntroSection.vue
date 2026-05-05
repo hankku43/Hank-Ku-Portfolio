@@ -112,7 +112,7 @@
 
                     <!-- Hover 時 inline 播放 -->
                     <video v-if="videoHovered"
-                        src="/videos/demo.mp4"
+                        :src="'/videos/demo.mp4'"
                         autoplay muted loop playsinline
                         class="inline-iframe"
                     ></video>

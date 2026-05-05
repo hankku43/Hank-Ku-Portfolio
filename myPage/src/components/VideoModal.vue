@@ -3,7 +3,7 @@
     <div class="modal-video-wrap">
       <video
         v-if="show"
-        src="/videos/demo.mp4"
+        :src="'/videos/demo.mp4'"
         controls
         autoplay
         class="demo-video"
