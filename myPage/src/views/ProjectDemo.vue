@@ -518,17 +518,18 @@ const handleSubmit = async () => {
                 buffer = lines.pop() ?? '';
                 for (const line of lines) {
                     if (!line.startsWith('data: ')) continue;
+                    let event;
                     try {
-                        const event = JSON.parse(line.slice(6));
-                        if (event.type === 'status') {
-                            statusMsg.value = event.message;
-                        } else if (event.type === 'result') {
-                            ragResult.value = event;
-                            _doneStatus();
-                        } else if (event.type === 'error') {
-                            throw new Error(event.message);
-                        }
-                    } catch (_) {}
+                        event = JSON.parse(line.slice(6));
+                    } catch (_) { continue; }
+                    if (event.type === 'status') {
+                        statusMsg.value = event.message;
+                    } else if (event.type === 'result') {
+                        ragResult.value = event;
+                        _doneStatus();
+                    } else if (event.type === 'error') {
+                        throw new Error(event.message);
+                    }
                 }
             }
         } catch (e) {
