@@ -3,7 +3,7 @@
         <div>
             © 2026 古亦弘 •
             <span class="social-icon">💼</span>
-            <a href="https://pda.104.com.tw/profile/share/8u5AhUDnaZp9IAGySTq1YrnTwUqyovlu" target="_blank">104
+            <a href="https://pda.104.com.tw/profile/share/8ul4MIL0SfubRPBWe6CTpRP4D3NtvnLq" target="_blank">104
                 Resume</a> •
             <a href="https://accompartner.dev" target="_blank">Accompartner.dev</a> •
             <a href="mailto:hank.ku43@gmail.com">Email Me</a>
